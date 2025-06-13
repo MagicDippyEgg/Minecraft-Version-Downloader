@@ -2,45 +2,99 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Minecraft Version Downloader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minecraft Java Version Downloader</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Minecraft Version Downloader</h1>
-      <p>Download Minecraft Java versions easily with a simple GUI tool.</p>
-      <a href="https://github.com/MagicDippyEgg/Minecraft-Version-Downloader/releases" class="btn">Download</a>
-    </header>
+  <header>
+    <h1>Minecraft Java Version Downloader</h1>
+    <p class="tagline">Download any official Minecraft Java version easily.</p>
+  </header>
 
-    <main>
-      <section class="features">
-        <h2>Features</h2>
-        <div class="grid">
-          <div class="card">🧱 Choose any Minecraft Java version</div>
-          <div class="card">📡 Uses official Mojang data</div>
-          <div class="card">⚡ Fast, minimal, and responsive</div>
-          <div class="card">🖥 Simple GUI – no command line</div>
-        </div>
-      </section>
+  <main>
+    <section class="intro">
+      <h2>About the Tool</h2>
+      <p>
+        This downloader lets you quickly grab any official Minecraft Java Edition version without hassle. Lightweight and easy to use.
+      </p>
+      <ul>
+        <li>Supports all official versions and snapshots</li>
+        <li>Automatic manifest updates</li>
+        <li>The basic code is on <a href="https://github.com/MagicDippyEgg/Minecraft-Version-Downloader" style="color: white;">GitHub</a></li>
+      </ul>
+    </section>
 
-      <section class="screenshots">
-        <h2>Screenshot Preview</h2>
-        <p>Screenshots will be added soon.</p>
-      </section>
+    <section class="download">
+      <h2>Get the Downloader</h2>
+      <p>
+        Download the latest release from our GitHub page below:
+      </p>
+      <a
+        href="https://github.com/MagicDippyEgg/Minecraft-Version-Downloader/releases"
+        target="_blank"
+        rel="noopener"
+        class="btn"
+      >
+        View Releases
+      </a>
+    </section>
 
-      <section class="about">
-        <h2>About</h2>
-        <p>
-          This open-source tool helps you download Minecraft Java versions without the mess. Built to be clean, fast, and GUI-only.
-        </p>
-        <a href="https://github.com/MagicDippyEgg/Minecraft-Version-Downloader" class="link">View GitHub Repository</a>
-      </section>
-    </main>
+    <section class="screenshots">
+      <h2>Screenshots</h2>
+      <div class="gallery">
+        <img src="Screenshot1.png" alt="Screenshot 1" tabindex="0" />
+        <img src="Screenshot2.png" alt="Screenshot 2" tabindex="0" />
+        <img src="Screenshot3.png" alt="Screenshot 3" tabindex="0" />
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p></p>
+  </footer>
+
+  <div id="modal" aria-hidden="true" role="dialog" tabindex="-1">
+    <img id="modal-img" alt="Enlarged screenshot" />
+    <button id="modal-close" aria-label="Close">&times;</button>
   </div>
+
+  <script>
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modal-img");
+    const modalClose = document.getElementById("modal-close");
+
+    document.querySelectorAll(".gallery img").forEach((img) => {
+      img.addEventListener("click", () => {
+        modalImg.src = img.src;
+        modal.style.display = "flex";
+        modal.setAttribute("aria-hidden", "false");
+        modalClose.focus();
+      });
+      img.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          img.click();
+        }
+      });
+    });
+
+    function closeModal() {
+      modal.style.display = "none";
+      modalImg.src = "";
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    modalClose.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.style.display === "flex") closeModal();
+    });
+  </script>
 </body>
 </html>
