@@ -26,14 +26,25 @@ class App(tk.Tk):
         self.load_progress = ttk.Progressbar(self, mode='indeterminate')
         self.load_progress.grid(row=0, column=0, columnspan=2, sticky='ew', padx=10, pady=10)
 
+        # Frame to hold version list and scrollbar
+        list_frame = ttk.Frame(self)
+        list_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
+        list_frame.rowconfigure(0, weight=1)
+        list_frame.columnconfigure(0, weight=1)
+
         # Version list on left
         cols = ("Version", "Type", "Release Time")
-        self.vers_list = ttk.Treeview(self, columns=cols, show="headings", selectmode='browse')
+        self.vers_list = ttk.Treeview(list_frame, columns=cols, show="headings", selectmode='browse')
         for col in cols:
             self.vers_list.heading(col, text=col)
             self.vers_list.column(col, anchor="w", width=200)
-        self.vers_list.bind("<<TreeviewSelect>>", self.on_select)
-        self.vers_list.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
+        self.vers_list.grid(row=0, column=0, sticky="nsew")
+        self.vers_list.bind("<<TreeviewSelect>>", self.on_select)  # Re-added binding
+
+        # Scrollbar for version list
+        list_scroll = ttk.Scrollbar(list_frame, orient="vertical", command=self.vers_list.yview)
+        list_scroll.grid(row=0, column=1, sticky="ns")
+        self.vers_list.configure(yscrollcommand=list_scroll.set)
 
         # Details panel on right
         detail_frame = ttk.Frame(self, padding=(10,10))
