@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiMS – Minecraft Server Manager</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background: #1e1e1e;
+      color: #f5f5f5;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #292929;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: #bbbbbb;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .section {
+      margin-bottom: 3rem;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .btn {
+      background: #4CAF50;
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease-in-out;
+    }
+
+    .btn:hover {
+      background: #45a049;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      padding-left: 1.5rem;
+    }
+
+    .screenshot-section {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .screenshot-category {
+      background: #2c2c2c;
+      padding: 1.5rem;
+      border-radius: 1rem;
+    }
+
+    .screenshot-category h3 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .screenshot-category img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+      border: 1px solid #444;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #777;
+      font-size: 0.9rem;
+    }
+
+    @media (min-width: 600px) {
+      .buttons {
+        flex-direction: row;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MultiMS</h1>
+    <p>A Simple & Advanced Minecraft Server Manager by Magic Dippy Egg</p>
+  </header>
+
+  <main>
+    <section class="section">
+      <h2>What is MultiMS?</h2>
+      <p>
+        MultiMS is a Python-based GUI application designed to make Minecraft server management easy. Whether you want a quick way to launch your servers or full control over multiple instances, MultiMS has a version for you.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>Downloads</h2>
+      <div class="buttons">
+        <a class="btn" href="MultiMS/MultiMS_Basic.exe" download>Download Basic Version</a>
+        <a class="btn" href="MultiMS/MultiMS_Advanced.exe" download>Download Advanced Version</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Features</h2>
+      <ul>
+        <li>One-click server start/stop</li>
+        <li>Organize and manage multiple Minecraft versions</li>
+        <li>Lightweight UI (Basic)</li>
+        <li>Custom layouts and controls (Advanced)</li>
+        <li>Built using Python and Tkinter</li>
+      </ul>
+    </section>
+
+    <section class="section screenshot-section">
+      <h2>Screenshots</h2>
+
+      <div class="screenshot-category">
+        <h3>Basic UI</h3>
+        <img src="MultiMS/basic-ui-1.png" alt="Basic UI Screenshot 1" />
+        <img src="MultiMS/basic-ui-2.png" alt="Basic UI Screenshot 2" />
+      </div>
+
+      <div class="screenshot-category">
+        <h3>Advanced UI</h3>
+        <img src="MultiMS/advanced-ui-1.png" alt="Advanced UI Screenshot 1" />
+        <img src="MultiMS/advanced-ui-2.png" alt="Advanced UI Screenshot 2" />
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 Magic Dippy Egg – Built with love and Python
+  </footer>
+</body>
+</html>
