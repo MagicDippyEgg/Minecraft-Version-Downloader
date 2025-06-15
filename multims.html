@@ -64,6 +64,23 @@
       background: #45a049;
     }
 
+    .back-btn { /* New style for the back button */
+      background: #555;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease-in-out;
+      margin-top: 2rem; /* Add some spacing */
+    }
+
+    .back-btn:hover {
+      background: #666;
+    }
+
     h2 {
       font-size: 1.8rem;
       margin-bottom: 1rem;
@@ -159,10 +176,10 @@
         <img src="MultiMS/advanced-ui-2.png" alt="Advanced UI Screenshot 2" />
       </div>
     </section>
-  </main>
 
-  <footer>
-    &copy; 2025 Magic Dippy Egg – Built with love and Python
-  </footer>
+    <section class="section" style="text-align: center;">
+      <a class="back-btn" href="index.html">Back to Home</a>
+    </section>
+  </main>
 </body>
 </html>
