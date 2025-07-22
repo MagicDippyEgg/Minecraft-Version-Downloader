@@ -7,6 +7,8 @@ import json
 import os
 
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
+# NEW: URL for the fallback missing servers JSON
+MISSING_SERVERS_URL = "https://magicdippyegg.github.io/Minecraft-Version-Downloader/missing_servers.json"
 
 class App(tk.Tk):
     def __init__(self):
@@ -96,15 +98,29 @@ class App(tk.Tk):
 
         self.all_versions = [] # Store the complete list of versions
         self.current_display_versions = [] # Store the currently filtered/displayed versions
+        self.missing_versions_map = {} # NEW: Stores missing_servers data: id -> server_url
 
         threading.Thread(target=self.load_versions, daemon=True).start()
 
     def load_versions(self):
         try:
             self.load_progress.start(10)
+            # Load main manifest
             resp = urllib.request.urlopen(MANIFEST_URL)
             manifest = json.load(resp)
             self.all_versions = manifest["versions"] # Store all versions
+
+            # NEW: Load missing servers manifest
+            try:
+                resp_missing = urllib.request.urlopen(MISSING_SERVERS_URL)
+                missing_data = json.load(resp_missing)
+                for entry in missing_data.get("versions", []):
+                    self.missing_versions_map[entry["id"]] = entry["server_url"]
+            except Exception as e:
+                # Show a warning but don't stop the app if the fallback list fails to load
+                print(f"Warning: Failed to load fallback server list: {e}")
+                messagebox.showwarning("Warning", f"Could not load fallback server list:\n{e}")
+
             self.update_version_list(self.all_versions) # Display all initially
         except Exception as e:
             messagebox.showerror("Error", f"Failed to load manifest:\n{e}")
@@ -159,51 +175,78 @@ class App(tk.Tk):
         if idx >= len(self.current_display_versions):
             return # Index out of bounds if selection was made on old list
         v = self.current_display_versions[idx]
+
+        self.vjson = {} # Reset vjson details from Mojang
+        self.client_url = None
+        self.server_url = None
+        self.tech_info = [] # Reset technical info
+
+        mojang_details_loaded = False
         try:
             resp = urllib.request.urlopen(v["url"])
             self.vjson = json.load(resp)
+            downloads = self.vjson.get('downloads', {})
+            self.client_url = downloads.get('client', {}).get('url')
+            self.server_url = downloads.get('server', {}).get('url')
+            mojang_details_loaded = True
         except Exception as e:
-            self.show_details(f"Error loading details:\n{e}")
-            # Ensure buttons are disabled on error
-            self.download_server_btn.config(state=tk.DISABLED)
-            self.download_client_btn.config(state=tk.DISABLED)
-            self.tech_btn.config(state=tk.DISABLED)
-            return
+            # If Mojang's full details cannot be loaded, still proceed to check fallback
+            # Show a warning in the details area
+            self.show_details(f"Warning: Could not load full Mojang details for {v['id']}:\n{e}\nChecking fallback server list...")
+            # Ensure buttons remain disabled for now if primary load fails,
+            # unless fallback finds something.
+
+        # --- NEW FALLBACK LOGIC ---
+        # If server_url was NOT found from Mojang's data, check the fallback list
+        if not self.server_url and v["id"] in self.missing_versions_map:
+            self.server_url = self.missing_versions_map[v["id"]]
+            # No client URL from missing_servers.json, so client_url remains None unless from Mojang
+        # --- END NEW FALLBACK LOGIC ---
 
         lines = [
-            f"ID: {self.vjson.get('id')}",
-            f"Type: {self.vjson.get('type')}",
-            f"Release Time: {self.vjson.get('releaseTime')}"
+            f"ID: {v.get('id', 'N/A')}",
+            f"Type: {v.get('type', 'N/A')}",
+            f"Release Time: {v.get('releaseTime', 'N/A')}"
         ]
-        if 'mainClass' in self.vjson:
-            lines.append(f"Main Class: {self.vjson['mainClass']}")
-        if 'complianceLevel' in self.vjson:
-            lines.append(f"Compliance Level: {self.vjson['complianceLevel']}")
 
-        downloads = self.vjson.get('downloads', {})
-        self.client_url = downloads.get('client', {}).get('url')
-        self.server_url = downloads.get('server', {}).get('url')
+        # Add details from Mojang's vjson if it was successfully loaded
+        if mojang_details_loaded:
+            if 'mainClass' in self.vjson:
+                lines.append(f"Main Class: {self.vjson['mainClass']}")
+            if 'complianceLevel' in self.vjson:
+                lines.append(f"Compliance Level: {self.vjson['complianceLevel']}")
+
+        # Report client jar info if available
         if self.client_url:
-            size = downloads['client'].get('size', 'n/a')
-            lines.append(f"Client Jar Size: {size} bytes")
+            client_size = self.vjson.get('downloads', {}).get('client', {}).get('size', 'n/a')
+            lines.append(f"Client Jar Size: {client_size} bytes")
+        # Report server jar info if available (can be from Mojang or fallback)
         if self.server_url:
-            size = downloads['server'].get('size', 'n/a')
-            lines.append(f"Server Jar Size: {size} bytes")
+            # If server_url came from Mojang's downloads, get its size
+            if mojang_details_loaded and self.server_url == self.vjson.get('downloads', {}).get('server', {}).get('url'):
+                 server_size = self.vjson.get('downloads', {}).get('server', {}).get('size', 'n/a')
+                 lines.append(f"Server Jar Size: {server_size} bytes")
+            else:
+                 # Server URL likely came from fallback or Mojang didn't provide size
+                 lines.append(f"Server Jar: Available (Source: {'Fallback' if v['id'] in self.missing_versions_map else 'Mojang (size N/A)'})")
+
 
         self.show_details("\n".join(lines))
-        # prepare technical info
-        self.tech_info = []
-        ai = self.vjson.get('assetIndex', {})
-        if ai:
-            self.tech_info.append(f"AssetIndex URL: {ai.get('url')}")
-            self.tech_info.append(f"AssetIndex SHA1: {ai.get('sha1')}")
-        for part in ('client','server'):
-            info = downloads.get(part, {})
-            if info:
-                self.tech_info.append(f"{part.capitalize()} URL: {info.get('url')}")
-                self.tech_info.append(f"{part.capitalize()} SHA1: {info.get('sha1')}")
-        self.tech_info.append(f"Libraries Count: {len(self.vjson.get('libraries', []))}")
 
+        # prepare technical info ONLY from Mojang's vjson, as fallback only provides URL
+        if mojang_details_loaded:
+            ai = self.vjson.get('assetIndex', {})
+            if ai:
+                self.tech_info.append(f"AssetIndex URL: {ai.get('url')}")
+                self.tech_info.append(f"AssetIndex SHA1: {ai.get('sha1')}")
+            for part in ('client','server'):
+                info = self.vjson.get('downloads', {}).get(part, {})
+                if info and info.get('url'): # Check if URL exists in Mojang data
+                    self.tech_info.append(f"{part.capitalize()} URL: {info.get('url')}")
+                    self.tech_info.append(f"{part.capitalize()} SHA1: {info.get('sha1')}")
+            self.tech_info.append(f"Libraries Count: {len(self.vjson.get('libraries', []))}")
+
+        # Enable/disable buttons based on whether URLs were found (from Mojang or fallback)
         self.download_server_btn.config(state=tk.NORMAL if self.server_url else tk.DISABLED)
         self.download_client_btn.config(state=tk.NORMAL if self.client_url else tk.DISABLED)
         self.tech_btn.config(state=tk.NORMAL if self.tech_info else tk.DISABLED)
@@ -264,21 +307,9 @@ class App(tk.Tk):
                 idx = int(sel[0])
                 if idx < len(self.current_display_versions): # Check bounds
                     v = self.current_display_versions[idx]
-                    try:
-                        resp = urllib.request.urlopen(v["url"])
-                        self.vjson = json.load(resp)
-                        downloads = self.vjson.get('downloads', {})
-                        self.client_url = downloads.get('client', {}).get('url')
-                        self.server_url = downloads.get('server', {}).get('url')
-
-                        self.download_server_btn.config(state=tk.NORMAL if self.server_url else tk.DISABLED)
-                        self.download_client_btn.config(state=tk.NORMAL if self.client_url else tk.DISABLED)
-                        self.tech_btn.config(state=tk.NORMAL if hasattr(self, 'tech_info') and self.tech_info else tk.DISABLED)
-                    except Exception:
-                        # Fallback to disabled if re-loading info fails
-                        self.download_server_btn.config(state=tk.DISABLED)
-                        self.download_client_btn.config(state=tk.DISABLED)
-                        self.tech_btn.config(state=tk.DISABLED)
+                    # Re-trigger on_select to re-evaluate button states
+                    # This is cleaner than re-implementing the logic here
+                    self.on_select(None) # Pass None as event as we are not reacting to a real event
             else:
                 self.download_server_btn.config(state=tk.DISABLED)
                 self.download_client_btn.config(state=tk.DISABLED)
