@@ -24,7 +24,7 @@ jobs:
 
       - name: Build EXE with PyInstaller
         run: |
-          pyinstaller --onefile --noconsole --clean mcdownloader.py
+          pyinstaller --onefile --noconsole --icon=icon.ico --clean mcdownloader.py
 
       - name: Rename EXE with version from tag
         run: |
