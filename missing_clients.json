@@ -11,6 +11,18 @@
       "client_url": "https://magicdippyegg.github.io/Minecraft-Version-Downloader/jars/1.2/client.jar",
 	  "above": "1.1",
 	  "type": "snapshot"
+    },
+    {
+      "id": "b1.7_01",
+      "client_url": "https://magicdippyegg.github.io/Minecraft-Version-Downloader/jars/b1.7_01/client.jar",
+	  "above": "b1.7",
+	  "type": "old_beta"
+    },
+    {
+      "id": "a1.2.4",
+      "client_url": "https://magicdippyegg.github.io/Minecraft-Version-Downloader/jars/a1.2.4/client.jar",
+	  "above": "a1.2.3_04",
+	  "type": "old_alpha"
     }
   ]
 }
