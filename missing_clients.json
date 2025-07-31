@@ -3,7 +3,8 @@
     {
       "id": "a1.1.1",
       "client_url": "https://magicdippyegg.github.io/Minecraft-Version-Downloader/jars/a1.1.1/client.jar",
-	  "above": "a1.1.0"
+	  "above": "a1.1.0",
+	  "type": "old_alpha"
     }
   ]
 }
