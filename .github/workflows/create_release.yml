@@ -46,11 +46,18 @@ jobs:
           fi
         shell: bash
 
-      - name: Upload release
+      - name: Upload Windows release
+        if: runner.os == 'Windows'
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            dist/MinecraftVersionDownloader_${{ github.ref_name }}.exe
-            dist/MinecraftVersionDownloader_${{ github.ref_name }}_macos
+          files: dist/MinecraftVersionDownloader_${{ github.ref_name }}.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload macOS release
+        if: runner.os == 'macOS'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/MinecraftVersionDownloader_${{ github.ref_name }}_macos
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
