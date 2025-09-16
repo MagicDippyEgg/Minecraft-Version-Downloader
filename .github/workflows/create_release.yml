@@ -1,4 +1,4 @@
-name: Build and Release EXE
+name: Build and Release
 
 on:
   push:
@@ -7,7 +7,11 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,18 +26,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
 
-      - name: Build EXE with PyInstaller
+      - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile --noconsole --icon=icon.ico --clean mcdownloader.py
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            pyinstaller --onefile --noconsole --icon=icon.ico --clean mcdownloader.py
+          else
+            pyinstaller --onefile --clean mcdownloader.py
+          fi
 
-      - name: Rename EXE with version from tag
+      - name: Rename binary with version from tag
         run: |
           echo "Tag is ${{ github.ref_name }}"
-          mv dist/mcdownloader.exe dist/MinecraftVersionDownloader_${{ github.ref_name }}.exe
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            mv dist/mcdownloader.exe dist/MinecraftVersionDownloader_${{ github.ref_name }}.exe
+          else
+            mv dist/mcdownloader dist/MinecraftVersionDownloader_${{ github.ref_name }}_macos
+          fi
 
-      - name: Create GitHub Release and upload EXE
+      - name: Upload release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/MinecraftVersionDownloader_${{ github.ref_name }}.exe
+          files: |
+            dist/MinecraftVersionDownloader_${{ github.ref_name }}.exe
+            dist/MinecraftVersionDownloader_${{ github.ref_name }}_macos
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
